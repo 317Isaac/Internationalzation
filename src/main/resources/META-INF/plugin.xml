@@ -1,0 +1,40 @@
+<idea-plugin>
+    <id>com.github.isaac.internationalzationplugin</id>
+    <name>InternationalzationPlugin</name>
+    <version>1.0</version>
+    <vendor email="shicx317@outlook.com" url="https://317Isaac.github.io/">317Isaac Shi</vendor>
+
+    <description>International ,to translate words,auto created strings resources.</description>
+
+    <change-notes>Beta,Beta,Beta,Beta,Beta,Beta,Beta,Beta,Beta</change-notes>
+
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for description -->
+    <idea-version since-build="173.0"/>
+
+    <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
+         on how to target different products -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends>org.intellij.groovy</depends>
+    <depends>org.jetbrains.kotlin</depends>
+    <depends>org.jetbrains.android</depends>
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+
+        <action id="Internationalzation.TranslateAction"
+                class="io.github.isaac.action.TranslateAction"
+                text="Internationalzation Helper" description="Auto created international string resource">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="$Paste"/>
+        </action>
+        <group id="Internationalzation.BuildInternational"
+               text="Internationalzation Helper"
+               description="Auto created international string resource"
+               popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <action id="BuildInternational.Autogeneration"
+                    class="io.github.isaac.action.AutogenerationAction"/>
+        </group>  </actions>
+
+</idea-plugin>
