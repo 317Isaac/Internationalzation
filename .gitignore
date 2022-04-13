@@ -1,0 +1,12 @@
+# Gradle
+build
+.gradle/
+
+# Intellij
+*.ipr
+*.iml
+*.iws
+.idea/
+
+# Compiled class file
+*.class

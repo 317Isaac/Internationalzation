@@ -1,3 +1,39 @@
+<!DOCTYPE idea-plugin [
+        <!ELEMENT idea-plugin (id|name|version|vendor|description|change-notes|idea-version|depends|extensions|actions)*>
+        <!ELEMENT id (#PCDATA)>
+        <!ELEMENT name (#PCDATA)>
+        <!ELEMENT version (#PCDATA)>
+        <!ELEMENT vendor (#PCDATA)>
+        <!ATTLIST vendor
+                email CDATA #REQUIRED
+                url CDATA #REQUIRED>
+        <!ELEMENT description (#PCDATA)>
+        <!ELEMENT change-notes (#PCDATA)>
+        <!ELEMENT idea-version (#PCDATA)>
+        <!ATTLIST idea-version
+                since-build CDATA #REQUIRED>
+        <!ELEMENT depends (#PCDATA)>
+        <!ELEMENT extensions (#PCDATA)>
+        <!ATTLIST extensions
+                defaultExtensionNs CDATA #REQUIRED>
+        <!ELEMENT actions (group|action)*>
+        <!ELEMENT group (add-to-group|action)*>
+        <!ATTLIST group
+                id CDATA #REQUIRED
+                text CDATA #REQUIRED
+                description CDATA #REQUIRED
+                popup CDATA #REQUIRED>
+        <!ELEMENT add-to-group (#PCDATA)>
+        <!ATTLIST add-to-group
+                anchor CDATA #REQUIRED
+                group-id CDATA #REQUIRED>
+        <!ELEMENT action (add-to-group)*>
+        <!ATTLIST action
+                class CDATA #REQUIRED
+                description CDATA #IMPLIED
+                id CDATA #REQUIRED
+                text CDATA #IMPLIED>
+        ]>
 <idea-plugin>
     <id>com.github.isaac.internationalzationplugin</id>
     <name>InternationalzationPlugin</name>
@@ -23,11 +59,6 @@
 
     <actions>
 
-        <action id="Internationalzation.TranslateAction"
-                class="io.github.isaac.action.TranslateAction"
-                text="Internationalzation Helper" description="Auto created international string resource">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="$Paste"/>
-        </action>
         <group id="Internationalzation.BuildInternational"
                text="Internationalzation Helper"
                description="Auto created international string resource"
@@ -35,6 +66,11 @@
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <action id="BuildInternational.Autogeneration"
                     class="io.github.isaac.action.AutogenerationAction"/>
-        </group>  </actions>
+        </group>
+        <action id="Translate.TranslationAction" class="io.github.isaac.action.TranslationAction" text="翻译"
+                description="翻译选中的文案">
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+    </actions>
 
 </idea-plugin>
