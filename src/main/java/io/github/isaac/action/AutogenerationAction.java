@@ -7,6 +7,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.search.FilenameIndex;
 import io.github.isaac.Constant;
 import io.github.isaac.TextUtil;
@@ -57,6 +58,14 @@ public class AutogenerationAction extends AnAction implements IDialogInterface {
             Messages.showMessageDialog("中文词句未包含中文或英文词语内有中文字符", "错误", Messages.getWarningIcon());
             return;
         }
+        insertString();
+    }
+
+    private void insertString() {
+
+    }
+
+    private boolean checkCnStringXmlBuild() {
     }
 
     private void buildInternationalString(AnActionEvent e) {
