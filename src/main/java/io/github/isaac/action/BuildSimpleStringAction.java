@@ -1,37 +1,54 @@
 package io.github.isaac.action;
 
-
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.search.FilenameIndex;
+import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.PsiShortNamesCache;
+import com.intellij.psi.xml.XmlDocument;
+import com.intellij.psi.xml.XmlFile;
+import com.intellij.util.xml.DomManager;
 import io.github.isaac.Constant;
 import io.github.isaac.TextUtil;
-import io.github.isaac.Utils;
 import io.github.isaac.gui.CreateGenerationDialog;
 import io.github.isaac.listeners.IDialogInterface;
 import io.github.isaac.model.DataModel;
+import io.github.isaac.model.SupportedLanguages;
 import kotlin.jvm.internal.Intrinsics;
-import kotlin.text.StringsKt;
+import org.jetbrains.android.dom.resources.Resources;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Objects;
 
+import static io.github.isaac.Utils.isEnglishStringXML;
 
-public class AutogenerationAction extends AnAction implements IDialogInterface {
+public class BuildSimpleStringAction extends AnAction implements IDialogInterface {
 
     private CreateGenerationDialog mDialog;
-    AnActionEvent tempE;
     private VirtualFile clickedFile;
+    private AnActionEvent event;
+
     @Override
-    public void actionPerformed(AnActionEvent e) {
-        System.out.println("AutogenerationAction actionPerformed");
-        tempE = e;
+    public void update(@NotNull AnActionEvent e) {
+        Intrinsics.checkParameterIsNotNull(e, "e");
+        VirtualFile file = (VirtualFile) CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
+        boolean isStringXML = isEnglishStringXML(file);
+        Intrinsics.checkExpressionValueIsNotNull(e.getPresentation(), "presentation");
+        e.getPresentation().setEnabled(isStringXML);
+        Intrinsics.checkExpressionValueIsNotNull(e.getPresentation(), "presentation");
+        e.getPresentation().setVisible(isStringXML);Intrinsics.checkParameterIsNotNull(e, "e");
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        clickedFile = (VirtualFile) CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
+        event = e;
         createGenerationDialog();
     }
 
@@ -66,34 +83,25 @@ public class AutogenerationAction extends AnAction implements IDialogInterface {
             Messages.showMessageDialog("中文词句未包含中文或英文词语内有中文字符", "错误", Messages.getWarningIcon());
             return;
         }
-        insertString();
+        insertString(dataModel);
     }
 
-    private void insertString() {
-        if (tempE != null) {
-            buildInternationalString(tempE);
+    private void insertString(DataModel dataModel) {
+        if (event != null && dataModel != null) {
+            XmlFile xmlFile = (XmlFile) event.getData(LangDataKeys.PSI_FILE);
+            DomManager domManager = DomManager.getDomManager(Objects.requireNonNull(event.getProject()));
+
+            WriteCommandAction.runWriteCommandAction(event.getProject(), () -> {
+
+                XmlDocument document = Objects.requireNonNull(xmlFile).getDocument();
+
+                mDialog.dispose();
+            });
         }
     }
 
-//    private boolean checkCnStringXmlBuild() {
-//    }
-
-    private void buildInternationalString(AnActionEvent e) {
-        final Project project= e.getProject();
-        WriteCommandAction.runWriteCommandAction(project, () -> {
-            assert project != null;
-            PsiFile[] psiFiles = FilenameIndex.getFilesByName(project, "strings.xml",
-                    GlobalSearchScope.allScope(project));
-            int count = 0;
-            for (PsiFile file : psiFiles) {
-                if (isEnglishStringXML(file)) {
-                    count++;
-                    System.out.println(file.getName());
-                    System.out.println(file.getText());
-                    System.out.println(count);
-                }
-            }
-        });
+    private void buildLanguageList() {
+        SupportedLanguages.getAllSupportedLanguages();
     }
 
     @Override
@@ -102,10 +110,4 @@ public class AutogenerationAction extends AnAction implements IDialogInterface {
             mDialog.dispose();
         }
     }
-
-    private boolean isEnglishStringXML(PsiFile file) {
-
-        return Utils.isEnglishStringXML(file.getVirtualFile());
-    }
-
 }

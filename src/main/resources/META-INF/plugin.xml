@@ -53,6 +53,9 @@
     <depends>org.intellij.groovy</depends>
     <depends>org.jetbrains.kotlin</depends>
     <depends>org.jetbrains.android</depends>
+    <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.lang</depends>
+
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
     </extensions>
@@ -65,11 +68,20 @@
                popup="true">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <action id="BuildInternational.Autogeneration"
-                    class="io.github.isaac.action.AutogenerationAction"/>
+                    class="io.github.isaac.action.AutogenerationAction" text="自动创建string"/>
+            <action id="BuildInternational.InPutStringAction"
+                    class="io.github.isaac.action.InPutStringAction" text="导入国际化文案列表"/>
+            <action id="BuildInternational.OutPutStringAction"
+                    class="io.github.isaac.action.OutPutStringAction" text="导出国际化文案列表"/>
         </group>
         <action id="Translate.TranslationAction" class="io.github.isaac.action.TranslationAction" text="翻译"
                 description="翻译选中的文案">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+        <action id="BuildInternational.BuildSimpleStringAction"
+                class="io.github.isaac.action.BuildSimpleStringAction" text="创建String词条"
+                description="创建三种语言的词条，简中，繁中，英语">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="after" relative-to-action="EditSource"/>
         </action>
     </actions>
 
