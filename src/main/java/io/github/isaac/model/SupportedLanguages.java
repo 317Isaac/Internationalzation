@@ -6,13 +6,11 @@ import java.util.List;
 public enum SupportedLanguages {
     Chinese_Simplified("zh-CN", "简体中文", "Chinese Simplified"),
 
-    Chinese_Simplified_BING("zh-CHS", "简体中文", "Chinese Simplified"),
+    Chinese_Traditional("zh-HK", "繁体中文", "Chinese Traditional"),
 
-    Chinese_Traditional("zh-TW", "繁体中文", "Chinese Traditional"),
+    English("en", "English", "English"),
 
-    Chinese_Traditional_BING("zh-CHT", "繁体中文", "Chinese Traditional"),
-
-    English("en", "English", "English");
+    DefaultLocal("", "Default","Default");
 
     private String languageCode;
 
@@ -47,15 +45,16 @@ public enum SupportedLanguages {
     }
 
     public String getAndroidStringFolderNameSuffix() {
-        if (this == Chinese_Simplified_BING || this == Chinese_Simplified)
+        if (this == Chinese_Simplified)
             return "zh-rCN";
-        if (this == Chinese_Traditional_BING || this == Chinese_Traditional)
+        if (this == Chinese_Traditional)
             return "zh-rTW";
         return getLanguageCode();
     }
 
     private static List<SupportedLanguages> getI18nsLanguages() {
         List<SupportedLanguages> result = new ArrayList<>();
+        result.add(DefaultLocal);
         result.add(English);
         result.add(Chinese_Simplified);
         result.add(Chinese_Traditional);

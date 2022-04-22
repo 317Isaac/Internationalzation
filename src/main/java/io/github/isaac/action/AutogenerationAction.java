@@ -4,7 +4,6 @@ package io.github.isaac.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,8 +16,6 @@ import io.github.isaac.Utils;
 import io.github.isaac.gui.CreateGenerationDialog;
 import io.github.isaac.listeners.IDialogInterface;
 import io.github.isaac.model.DataModel;
-import kotlin.jvm.internal.Intrinsics;
-import kotlin.text.StringsKt;
 
 import java.awt.*;
 
@@ -105,7 +102,7 @@ public class AutogenerationAction extends AnAction implements IDialogInterface {
 
     private boolean isEnglishStringXML(PsiFile file) {
 
-        return Utils.isEnglishStringXML(file.getVirtualFile());
+        return Utils.isStringXML(file.getVirtualFile());
     }
 
 }

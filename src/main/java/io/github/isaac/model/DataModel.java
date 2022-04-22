@@ -48,6 +48,20 @@ public class DataModel {
         this.valueEnglish = valueEnglish;
     }
 
+    public String getValueByLanguages(SupportedLanguages languages) {
+        switch (languages) {
+            case Chinese_Simplified:
+                return getValueSimpleCn();
+            case Chinese_Traditional:
+                return getValueTraditionalCn();
+            case English:
+            case DefaultLocal:
+                return getValueEnglish();
+            default:
+                return "";
+        }
+    }
+
     public boolean isDataIllegal() {
         return TextUtil.isEmpty(id)
                 || TextUtil.isEmpty(valueSimpleCn)

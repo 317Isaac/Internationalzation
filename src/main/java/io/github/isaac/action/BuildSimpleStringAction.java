@@ -5,40 +5,47 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.PsiShortNamesCache;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.impl.source.xml.XmlFileImpl;
+import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.xml.XmlDocument;
 import com.intellij.psi.xml.XmlFile;
-import com.intellij.util.xml.DomManager;
+import com.intellij.psi.xml.XmlTag;
 import io.github.isaac.Constant;
 import io.github.isaac.TextUtil;
+import io.github.isaac.Utils;
 import io.github.isaac.gui.CreateGenerationDialog;
 import io.github.isaac.listeners.IDialogInterface;
+import io.github.isaac.model.AndroidString;
 import io.github.isaac.model.DataModel;
 import io.github.isaac.model.SupportedLanguages;
 import kotlin.jvm.internal.Intrinsics;
-import org.jetbrains.android.dom.resources.Resources;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-import static io.github.isaac.Utils.isEnglishStringXML;
+import static io.github.isaac.Utils.isStringXML;
 
 public class BuildSimpleStringAction extends AnAction implements IDialogInterface {
 
     private CreateGenerationDialog mDialog;
-    private VirtualFile clickedFile;
     private AnActionEvent event;
 
     @Override
     public void update(@NotNull AnActionEvent e) {
         Intrinsics.checkParameterIsNotNull(e, "e");
         VirtualFile file = (VirtualFile) CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
-        boolean isStringXML = isEnglishStringXML(file);
+        boolean isStringXML = isStringXML(file);
         Intrinsics.checkExpressionValueIsNotNull(e.getPresentation(), "presentation");
         e.getPresentation().setEnabled(isStringXML);
         Intrinsics.checkExpressionValueIsNotNull(e.getPresentation(), "presentation");
@@ -47,7 +54,6 @@ public class BuildSimpleStringAction extends AnAction implements IDialogInterfac
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        clickedFile = (VirtualFile) CommonDataKeys.VIRTUAL_FILE.getData(e.getDataContext());
         event = e;
         createGenerationDialog();
     }
@@ -89,19 +95,55 @@ public class BuildSimpleStringAction extends AnAction implements IDialogInterfac
     private void insertString(DataModel dataModel) {
         if (event != null && dataModel != null) {
             XmlFile xmlFile = (XmlFile) event.getData(LangDataKeys.PSI_FILE);
-            DomManager domManager = DomManager.getDomManager(Objects.requireNonNull(event.getProject()));
+            if (xmlFile != null) {
 
-            WriteCommandAction.runWriteCommandAction(event.getProject(), () -> {
+                WriteCommandAction.runWriteCommandAction(event.getProject(), () -> {
+                    VirtualFile stringsFile = xmlFile.getVirtualFile();
+                    List<SupportedLanguages> supportLanguages = SupportedLanguages.getAllSupportedLanguages();
+                    for (SupportedLanguages languages: supportLanguages) {
+                        String filePath = Utils.getValueResourcePath(languages, stringsFile);
+                        insertStringByLanguages(languages, filePath, dataModel);
+                    }
+                    mDialog.dispose();
+                });
+            }
 
-                XmlDocument document = Objects.requireNonNull(xmlFile).getDocument();
-
-                mDialog.dispose();
-            });
         }
     }
 
-    private void buildLanguageList() {
-        SupportedLanguages.getAllSupportedLanguages();
+    private void insertStringByLanguages(SupportedLanguages language, String filePath, DataModel dataModel) {
+        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+        if (virtualFile != null) {
+            addStringElement(language, virtualFile, dataModel);
+        } else {
+            writeAndroidStringToLocal(language, filePath, dataModel);
+        }
+    }
+
+    private void addStringElement(SupportedLanguages language, VirtualFile virtualFile, DataModel dataModel) {
+        PsiFile psiFile = PsiManager.getInstance(Objects.requireNonNull(event.getProject())).findFile(virtualFile);
+        assert psiFile != null;
+        XmlDocument document = ((XmlFileImpl)psiFile).getDocument();
+        if (document != null) {
+            XmlTag resourceTag = document.getRootTag();
+            if (resourceTag != null) {
+                XmlTag[] strings = resourceTag.findSubTags("string");
+                XmlTag addString = resourceTag.createChildTag("string", "", dataModel.getValueByLanguages(language),false);
+                addString.setAttribute("name", dataModel.getId());
+                addString.getValue().setText(dataModel.getValueByLanguages(language));
+                resourceTag.addSubTag(addString,false);
+            }
+        }
+    }
+
+    private void writeAndroidStringToLocal(SupportedLanguages language, String filePath, DataModel dataModel) {
+        List<AndroidString> stringList = new ArrayList<AndroidString>();
+        AndroidString addString = new AndroidString();
+        addString.setKey(dataModel.getId());
+        addString.setValue(dataModel.getValueByLanguages(language));
+        addString.setLanguage(language);
+        stringList.add(addString);
+        Utils.writeAndroidStringToLocal(event.getProject(), filePath, stringList);
     }
 
     @Override
