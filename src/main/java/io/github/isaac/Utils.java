@@ -6,12 +6,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import io.github.isaac.model.AndroidString;
 import io.github.isaac.model.SupportedLanguages;
 import kotlin.jvm.internal.Intrinsics;
+import org.apache.poi.poifs.filesystem.FileMagic;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.List;
+import java.util.Objects;
 
 public class Utils {
 
@@ -30,6 +29,26 @@ public class Utils {
                 || file.getParent().getName().startsWith("values-" + SupportedLanguages.English.getAndroidStringFolderNameSuffix())
                 || file.getParent().getName().startsWith("values-" + SupportedLanguages.Chinese_Simplified.getAndroidStringFolderNameSuffix())
                 || file.getParent().getName().startsWith("values-" + SupportedLanguages.Chinese_Traditional.getAndroidStringFolderNameSuffix()));
+    }
+
+    public static boolean isExcelFile(String path) {
+        if (TextUtil.isEmpty(path)) {
+            return false;
+        }
+        return path.endsWith(".xls") || path.endsWith(".xlsx");
+    }
+
+    public static boolean isExcelFile(InputStream inputStream) {
+        boolean result = false;
+        try {
+            FileMagic fileMagic = FileMagic.valueOf(inputStream);
+            if (Objects.equals(fileMagic, FileMagic.OLE2)||Objects.equals(fileMagic, FileMagic.OOXML)) {
+                result = true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     public static String getValueResourcePath(SupportedLanguages language, VirtualFile file) {

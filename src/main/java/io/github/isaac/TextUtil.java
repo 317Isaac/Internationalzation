@@ -18,7 +18,7 @@ public class TextUtil {
      * 判断字符串是否为NULL或空字符串
      *
      * @param str 字符串实例
-     * @return true 当字符串为NULL或空字符串, 否则 false
+     * @return true 当字符串为NULL或空字符, 否则 false
      */
     public static boolean isEmpty(String str) {
         return null == str || str.isEmpty();

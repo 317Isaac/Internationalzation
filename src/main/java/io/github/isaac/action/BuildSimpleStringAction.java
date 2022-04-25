@@ -60,14 +60,14 @@ public class BuildSimpleStringAction extends AnAction implements IDialogInterfac
 
     private void createGenerationDialog() {
         mDialog = new CreateGenerationDialog();
-        // 设置对话框窗体大小
+
         mDialog.setPreferredSize(new Dimension(800, 600));
-        // 设置对话框标题
+
         mDialog.setTitle(Constant.CREATE_INTERNATIONAL_GENERATION_DIALOG);
 
         mDialog.setDialogInterface(this);
         mDialog.pack();
-        // 设置对话框居于屏幕正中
+
         mDialog.setLocationRelativeTo(null);
 
         mDialog.setVisible(true);

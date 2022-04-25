@@ -9,10 +9,10 @@ version '1.0'
 sourceCompatibility = 1.8
 
 repositories {
-//    mavenCentral()
     maven{
         url 'https://maven.aliyun.com/repository/central'
     }
+    mavenCentral()
 }
 
 dependencies {
